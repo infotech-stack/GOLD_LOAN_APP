@@ -67,6 +67,7 @@ const schemaRoutes = require("./routes/schemaRoutes");
 const loanEntryRoutes = require("./routes/loanEntryRoutes");
 const customerRoutes = require("./routes/customer");
 const goldLoanEntryRoutes = require("./routes/goldLoanEntry");
+const paidVoucherRoutes=require('./routes/paidVoucherRoutes');
 
 app.use("/api/repledge", goldLoanEntryRoutes);
 app.use("/api/customers", customerRoutes);
@@ -80,6 +81,7 @@ app.use("/api/vouchers", voucherRoutes);
 app.use("/api/ledger", ledgerRouter);
 app.use("/api/salary", salaryRoutes);
 app.use("/api/report", reportRoutes);
+app.use("/api/paidvouchers", paidVoucherRoutes);
 
 const frontendPath = path.join(__dirname, "../frontend/build");
 console.log("frontend path", frontendPath);
