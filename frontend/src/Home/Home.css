@@ -1,0 +1,39 @@
+.home_bg {
+  background-image: url("/src/Home/gold2.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100%;
+}
+
+.button1 {
+  background-color: #d34141 !important;
+  border-radius: 7px !important;
+  font-family: "Merienda", cursive !important;
+  font-weight: 700 !important;
+}
+
+.button2 {
+  background-color: #047bae !important;
+  border-radius: 7px !important;
+  width: 160px !important;
+  font-family: "Merienda", cursive !important;
+  font-weight: 700 !important;
+}
+
+.icon {
+  color: rgb(209, 168, 4) !important;
+}
+
+.heads {
+  color: #bf4343;
+  font-family: "Merienda", cursive !important;
+  font-weight: 700 !important;
+}
+.home-cont {
+  height: 420px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,0 +1,158 @@
+.nav_bar {
+  background-color: #d34141 !important;
+  z-index: 1000; /* Ensure the navbar is on top */
+  position: fixed; /* Ensure it stays fixed at the top */
+  width: 100%; /* Full width */
+  top: 0; /* Stick to the top */
+}
+.main-content {
+  margin-top: 80px; /* Same height as the Navbar to push content down */
+}
+.typo-font{
+  color: #ffb700 !important;
+  font-size: 25px !important;
+}
+.haed {
+  font-size: 22px !important;
+  font-family: nunito !important;
+  color: #ffffff  !important;
+  font-weight: 600 !important;
+}
+.icon-shield {
+  color: #f6c240 !important;
+  font-size: larger !important;
+}
+
+.icon-shield {
+  margin-right: 90px !important;
+  background-color: #f6c240 !important;
+  color: #d34141 !important;
+  border-radius: 50%;
+  padding: 7px;
+  cursor: pointer;
+}
+/* styles.css */
+.margin-top-80 {
+  margin-top: 80px;
+}
+
+.margin-top-20 {
+  margin-top: 20px;
+}
+
+.navbar-nav .nav-item .nav-link {
+  display: flex;
+  align-items: center;
+}
+
+.admin-info {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.nav-button1 {
+  background-color: #e8b022 !important;
+  color: #fff !important;
+  text-transform: capitalize !important;
+  width: 100px !important;
+  height: 30px !important;
+  margin-left: 6px !important;
+}
+.nav-button2 {
+  background-color: #d34141 !important;
+  color: #fff !important;
+  text-transform: capitalize !important;
+  width: 159px !important;
+  height: 30px !important;
+}
+.image-adm {
+  width: 70px !important;
+  height: 70px !important;
+}
+.new-icon {
+  position: relative;
+  right: 90px !important;
+  color: #f6c240 !important;
+}
+.sub-green {
+  background-color: rgb(29, 114, 88) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+.sub-green1 {
+  background-color: rgb(80, 28, 164) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+.sub-del {
+  background-color: rgb(181, 27, 10) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+.add-but {
+  background-color: rgb(226, 56, 56) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  border-radius: 30px !important;
+  width: 150px !important;
+}
+.sign-button {
+  height: 52px !important;
+}
+.upload-button {
+  text-transform: capitalize !important;
+  color:#e60202 !important;
+   border: 2px dashed #e60202  !important; 
+  border-radius: 4px !important;
+  padding: 8px 16px !important;
+  font-weight: bold;
+}
+.icon-color{
+  color:#e60202 !important;
+  font-size: 30px !important;
+}
+.cust_font{
+  font-size: 22px !important;
+}.downs{
+  background-color: #34662b !important;
+ width:180px !important;
+  height:35px !important;
+  padding:2px !important;
+  color:#ffffff !important;
+  font-weight: 500 !important;
+margin-right: 28px !important;
+ 
+}
+.form_control{
+  width:160px !important;
+  background-color: #fff !important;
+}
+
+.form_control .MuiFormControl-root {
+  height: 35px; 
+  background-color: #fff !important;
+}
+
+.form_control .MuiSelect-root {
+  height: 35px; 
+  padding: 0 14px; 
+  background-color: #fff !important;
+}
+.margin_left{
+  margin-left: 53px !important;
+}
+.form_control .MuiOutlinedInput-root {
+  height: 35px; 
+  padding: 0; 
+  background-color: #fff !important;
+}
+.form_control .MuiInputLabel-root {
+  line-height: 40px; /* Align label with Select component */
+  top: -13px; /* Move the label up by 1px */
+  margin-top: 1px; /* Adjust the top margin */
+}
+@media (min-width: 992px) {
+  .search {
+    width: 260px !important;
+  }
+}

@@ -1,0 +1,13 @@
+.signup-bgg {
+    background-image: url('../Login/loan9.webp'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .login-container{
+    background-color: rgb(255, 248, 235) !important;
+  }   

@@ -1,0 +1,66 @@
+
+
+  /* font-family: 'Poppins', sans-serif !important;
+  font-weight: 200 !important;
+  font-style: normal; */
+
+.hidden{
+  display :none !important;
+}
+ 
+.dashb-icon{
+    color:#d34141 !important;
+    transition: color 0.3s ease !important;
+    font-family: "Inter Tight", sans-serif !important;
+    font-optical-sizing: auto;
+  letter-spacing: 1px !important;
+}
+.dash_card {
+    background-color: #fff2d0 !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    font-family: "Inter Tight", sans-serif !important;
+    font-optical-sizing: auto;
+  letter-spacing: 1px !important;
+  }
+  .dashb-icon3{
+    color:rgb(7, 101, 70) !important;
+  }
+  .dashb-icon2{
+    color:rgb(111, 23, 96) !important
+  }
+  .dashb-icon1{
+    color:rgb(16, 55, 132) !important
+  }
+  .dash_card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    font-family: "Inter Tight", sans-serif !important;
+    font-optical-sizing: auto;
+  letter-spacing: 1px !important;
+  }
+  @media print {
+    .handleprints {
+      display: none !important; 
+
+    }
+  }
+  @media print {
+    .table-container {
+      page-break-inside: auto;
+    }
+  
+    table {
+      page-break-inside: auto;
+      page-break-after: auto;
+    }
+  
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+  }
+  
+  .handleprints{
+    width:80px !important;
+  }
+  

@@ -1,0 +1,75 @@
+.paperbg2{
+  background-color: rgb(248, 235, 250) !important;
+}
+.tables{
+  background-color: rgb(248, 235, 250) !important;
+align-items: center !important;
+}
+.tablehei{
+  height: 270px !important;
+  overflow: hidden !important;
+ 
+}
+.font-tamil{
+  font-size: 13px !important;
+  letter-spacing: -1px !important;
+
+}
+.font-tamil2{
+  font-size: 12px !important;
+  letter-spacing: -1px !important;
+
+}
+.font-tamill{
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+.tools-cl{
+  background-color: rgb(228, 220, 180) !important;
+}
+.billbook{
+  font-size: 5px !important;
+}.disables{
+  display: none !important;
+}
+.percent-hide{
+  display: none !important;
+}.report-button{
+text-transform: capitalize !important;
+display: inline-block !important;
+}
+.headss{
+  color: black !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+.newprint{
+  background-color: rgb(164, 6, 135) !important;
+  width:170px !important;
+  font-weight: 600 !important;
+  border-radius: 7px !important;
+ justify-content: center !important;
+
+}
+@media print {
+  .nav_bar,
+  .sidebar {
+    display: none !important;
+  }
+  .paperbg2,
+  .paperbg2 * {
+    visibility: visible;
+  }
+  .paperbg2 {
+   
+
+    justify-content: center;
+    align-items: center;
+  }
+  .print-button {
+    display: none !important;
+  }
+  .billbook {
+    margin-top: -49px !important; /* or 2px, depending on your requirement */
+  }
+}
+

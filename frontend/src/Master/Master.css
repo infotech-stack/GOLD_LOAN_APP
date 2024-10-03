@@ -1,0 +1,136 @@
+
+.customTextField {
+    margin-bottom: 15px;
+  
+  }
+  
+  .customInput {
+    color: black;
+    height: 39px;
+    padding: 5px;
+  }
+  .inputRoot {
+    margin: 5px 0;
+  }
+  .add-prod{
+    background-color: rgb(91, 3, 64) !important;
+    transition: transform 10s ease-in-out !important;
+    transform: scale(1.05) !important; 
+
+  }
+  .add-prod:hover{
+    transform: scale(1.05) !important; 
+    animation: fadeOut 0.2s ease-in-out; 
+ 
+  }
+  .fade-in {
+    animation: fadeIn(3000) !important; 
+  }.buttons1{
+    background-color: #560753 !important;
+  }
+  .add-prods{
+    background-color: #0199b4 !important;
+  }
+  .add-prodss{
+    background-color: #081f12 !important;
+    width: 200px !important;
+  }
+  .paperbg{
+    background-color: #fff2d0 !important;
+    /*background-color: #fdf6cc !important;*/
+  }
+/* styles.css */
+.schema-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: rgb(227, 212, 123) !important;
+
+}
+.cate-btn{
+  text-transform: capitalize !important;
+  background-color:#1784cc !important;
+  color: #ffffff!important;
+  width:100% !important;
+  height:32px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+
+}
+.cate_btns{
+  text-transform: capitalize !important;
+  color: #DA3522!important;
+  background-color: #F8C135 !important;
+}
+.cate{
+  color: #DA3522!important;
+  font-size: 13px !important;
+  background-color:#1784cc!important;
+}
+
+.swal-wide {
+  width: 700px !important; 
+  max-width: 100%;
+}
+.zindes{
+  z-index: -1 !important;
+}
+.custom-select .MuiOutlinedInput-root {
+  border: 1px solid black !important;
+}
+
+.custom-select .MuiOutlinedInput-notchedOutline {
+  border: 1px solid black !important;
+}
+
+.custom-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: black !important;
+}
+.daybook_font{
+  font-size: 16px !important;
+}
+.cust_table{
+  background-color: #1784CC !important;
+}
+.cust_button{
+  width:80px !important;
+  height:38px !important;
+}
+.cust_button1{
+  width:80px !important;
+  height:58px !important;
+}
+ .box1{
+ border:1px solid red !important;
+  
+} 
+.expenseedit{
+  text-transform: capitalize !important;
+  background-color: #1b654a !important;
+  height: 27px !important;
+  width:80px !important;
+  margin-right: 10px !important;
+
+}
+.expensedelete{
+  text-transform: capitalize !important;
+  background-color: #bf1212 !important;
+  height: 27px !important;
+  width:80px !important;
+  margin-right: 10px !important;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 2;
+  }
+}
+
+.animated-paper {
+  animation: fadeIn 2s ease-in-out; 
+
+}
+
+

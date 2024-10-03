@@ -1,0 +1,193 @@
+
+
+.sidebar {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  padding-bottom: 30px !important;
+  overflow-y: auto !important;
+  border-right: 1px solid #ddd;
+  transition: width 0.3s ease;
+  background-color: #f6c240 !important;
+  box-shadow: 0px 4px 6px rgba(149, 6, 6, 0.2);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.sidebar.open {
+  width: 300px !important;
+}
+
+.nav-link {
+  white-space: normal !important; 
+  word-wrap: break-word !important; 
+
+  display: block !important;
+  display: flex;
+  align-items: center;
+  padding: 4px 9px 7px !important;
+  font-size: 1rem;
+  color: #d72122 !important;
+  text-decoration: none;
+  font-weight: 500 !important;
+}
+
+.nav-link.active {
+  color: rgb(255, 255, 255) !important;
+  background-color: #d72122 !important;
+  border-radius: 6px !important;
+  width: 245px !important;
+}
+.disables-1{
+  visibility: hidden !important;
+}
+.swal2-front {
+  z-index: 9999 !important; 
+}
+
+.icons {
+  color: #d72122 !important;
+  font-size: 20px !important;
+  margin-right: 10px;
+  padding: 2px !important;
+  text-align: left !important;
+  font-weight: 900 !important;
+}
+.icons.active {
+  color: rgb(255, 255, 255) !important;
+}
+.sub-item {
+  padding: 8px 20px !important;
+  font-size: 14px !important;
+}
+
+.plus-icon {
+  margin-left: 18px !important;
+  font-size: 13px !important;
+  color: #d72122 !important;
+}
+
+.dropdown-icon {
+  color: #d72122 !important;
+  margin-left: 18px !important;
+}
+.dropdown-icon.active {
+  color: rgb(255, 255, 254) !important;
+  margin-left: 18px !important;
+}
+.ml-3 {
+  margin-left: 20px !important;
+  color: black !important;
+  font-size: 14px !important ;
+}
+
+.nav-links {
+  color: #d72122 !important;
+  text-decoration: none !important;
+  font-family: nunito !important;
+  margin: 2px !important;
+}
+
+.nav-links.active {
+  color: #047bae !important;
+}
+.nav-link.active .icons,
+.nav-link.active .dropdown-icon svg {
+  color: #ffffff;
+}
+.sub-but {
+  background-color: rgb(29, 114, 88) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+.sub-print {
+  background-color: rgb(224, 149, 1) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+.down {
+  background-color: #047bae !important;
+  width: 200px !important; /* Increase the width as needed */
+  align-items: center !important;
+  height: 30px !important;
+  font-weight: 600 !important;
+  padding: 4px !important;
+  font-size: 14px !important;
+  color: #fff !important;
+  text-transform: capitalize !important;
+  display: flex; /* Ensure the alignment styles work correctly */
+  justify-content: center; /* Center text horizontally */
+}
+
+.pdf-view .MuiTableCell-root {
+  font-size: 10px; /* Adjust as needed */
+  padding: 4px; /* Adjust as needed */
+}
+
+.pdf-view .MuiTableRow-root {
+  height: 20px; /* Adjust as needed */
+}
+.hidden {
+  display: none !important;
+}
+.papaerbg {
+  background-color: rgb(255, 254, 249) !important;
+  border: #ff5e00 2px solid !important;
+}
+.newpaperbgs {
+  background-color: rgb(252, 212, 126) !important;
+}
+.swal2-z-index {
+  z-index: 1400 !important;
+}
+.button_proof{
+  position: relative !important;
+  right:30px !important;
+  bottom:6px !important;
+  width:68px !important;
+  height:29px !important;
+  text-transform: capitalize !important;
+}
+.file_proof{
+  position: relative !important;
+  left:50px !important;
+}
+@media (max-width: 1290px) {
+  .sidebar {
+    display: none;
+    width: 200px;
+  }
+
+  .sidebar.open {
+    width: 299px !important;
+  }
+}
+
+@media (max-width: 1179px) {
+  .sidebar {
+    display: none;
+    width: 170px;
+  }
+
+  .sidebar.open {
+    width: 299px !important;
+  }
+}
+@media (max-width: 1179px) {
+  .nav-link {
+    font-size: 0.9rem !important; /* Decrease font size for smaller sidebars */
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-link {
+    font-size: 0.8rem ; /* Further decrease for very narrow sidebars */
+  }
+}
+@media print {
+  .printable-div {
+    margin-top: 150px !important;
+  }
+}

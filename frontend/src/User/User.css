@@ -1,0 +1,22 @@
+.aggre{
+    background-color: rgb(229, 243, 232) !important;
+}
+
+.textField .MuiFormLabel-root {
+    font-size: 14px; 
+  }
+.title{
+
+    font-size: 15px !important;
+}  
+.titles{
+font-weight: 600 !important;
+    font-size: 16px !important;
+}  
+.tit{
+ 
+    font-size: 15px !important;   
+}
+.title-1{
+    font-size: 14px !important;  
+}

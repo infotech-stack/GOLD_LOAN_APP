@@ -1,0 +1,54 @@
+.login-container {
+    max-width: 600px !important;
+    margin: 150px auto !important;
+    padding: 20px;
+  background-color: #f8ecb9 !important;
+    border-radius: 8px!important; 
+    border: 12px solid #F6c240 ;
+  }
+  
+  .login-header {
+    text-align: center !important;
+    margin-bottom: 20px !important;
+    font-size: 30px !important;
+    font-family: "Delius Swash Caps", cursive !important;
+    font-weight: 600 !important;
+    font-style: normal; 
+    color: #d34141 !important;
+    
+  }
+  
+  .login-form {
+    display: flex !important;
+    flex-direction: column!important;
+  }
+  
+  .login-input {
+    margin-bottom: 20px !important;
+  }
+  
+  
+  .login-button {
+    margin-top: 20px !important;
+    background-color: #d34141 !important;
+    font-family: "Delius Swash Caps", cursive !important;
+    font-weight: 600 !important;
+    font-style: normal; 
+    text-transform: capitalize !important;
+  }
+  
+  .login-success {
+    text-align: center !important;
+    margin-top: 20px !important;
+    color: green !important;
+  }
+  .signup-bg {
+    background-image: url('./loan9.webp'); /* Update the path to your image */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
