@@ -5,31 +5,13 @@ const Report = require('../models/report');  // Ensure correct path to the Repor
 
 const router = express.Router();
 
-// // Configure multer for file uploads
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null,'uploads/');
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, Date.now() + path.extname(file.originalname));
-//   },
-// });
-
-// const upload = multer({ storage });
-
-// POST route to submit the form data
 router.post('/', async (req, res) => {
   try {
-    console.log('Files:', req.files);  // Debug: Log the files object
-    console.log('Body:', req.body);    // Debug: Log the request body
+    console.log('Files:', req.files);  
+    console.log('Body:', req.body);    
 
-    // Extract file paths safely with default empty strings if files are not present
-    // const authorizedFilePath = req.files && req.files.authorizedFile ? req.files.authorizedFile[0].path : '';
-    // const customerSignPath = req.files && req.files.customersign ? req.files.customersign[0].path : '';
-    // const cashierSignPath = req.files && req.files.cashiersign ? req.files.cashiersign[0].path : '';
-
-    // Convert fields to numbers where appropriate
-    const totalAmount = parseFloat(req.body.totalAmount) || 0;  // Ensure it’s a number
+ 
+    const totalAmount = parseFloat(req.body.totalAmount) || 0; 
     const loanAmount = parseFloat(req.body.loanAmount) || 0;
     const interestPrinciple = parseFloat(req.body.interestPrinciple) || 0;
     const balancePrinciple = parseFloat(req.body.balancePrinciple) || 0;
@@ -41,12 +23,12 @@ router.post('/', async (req, res) => {
       customerName: req.body.customerName,
       date: req.body.date,
       customerId: req.body.customerId,
-      loanNo: req.body.loanNumber,
+      loanNo: req.body.loanNo,
       mobileNumber: req.body.mobileNumber,
       address: req.body.address,
       loanAmount: loanAmount,
       totalAmount: totalAmount,
-      // customerSign1: authorizedFilePath,
+   
       cashReceivedRs: loanAmount,
       rupeesInWords: req.body.rupeesInWords,
       paymentNo: req.body.paymentNo,
@@ -56,8 +38,7 @@ router.post('/', async (req, res) => {
       interestPrinciple: interestPrinciple,
       balancePrinciple: balancePrinciple,
       remarks: req.body.remarks,
-      // customerSign: customerSignPath,
-      // cashierSign: cashierSignPath,
+     
       closedate: req.body.closedate,
       lastDateForLoan:req.body.lastDateForLoan,
       jewels: jewelList, 

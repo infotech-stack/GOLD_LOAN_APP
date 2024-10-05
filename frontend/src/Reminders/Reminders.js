@@ -180,10 +180,7 @@ const Reminders = () => {
         },
         salaries: aggregatedSalaries[date] || { date: date, totalAmount: 0 },
         vouchers: aggregatedVouchers[date] || { date: date, totalAmount: 0 },
-        paidvoucher: aggregatedPaidVouchers[date] || {
-          date: date,
-          totalAmount: 0,
-        },
+        paidvoucher:aggregatedPaidVouchers[date] ||{ date: date, totalAmount: 0 },
         doccharge: aggregatedDocCharges[date] || { date: date, totalAmount: 0 },
         ledger: aggregatedLedger[date] || { date: date, totalAmount: 0 },
         appraisals: aggregatedAppraisals[date] || {
@@ -219,7 +216,7 @@ const Reminders = () => {
     const ledgerTotal = aggregatedLedger[date]?.totalAmount || 0;
     const appraisalTotal = aggregatedAppraisals[date]?.totalAmount || 0;
     const docChargeTotal = aggregatedDocCharges[date]?.totalAmount || 0;
-    const paidVoucherTotal = aggregatedPaidVouchers[date]?.totalAmount || 0;
+    const paidVoucherTotal=aggregatedPaidVouchers[date]?.totalAmount ||0;
 
     return (
       openingBalance +
@@ -227,7 +224,7 @@ const Reminders = () => {
       docChargeTotal +
       appraisalTotal -
       dayToDayTotal -
-      paidVoucherTotal -
+      paidVoucherTotal-
       salaryTotal -
       ledgerTotal
     );
@@ -680,7 +677,7 @@ const Reminders = () => {
       });
     }
   };
-
+ 
   const handleDelete6 = async (id) => {
     // First confirmation dialog
     const result = await Swal.fire({
@@ -692,7 +689,7 @@ const Reminders = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
     });
-
+  
     if (result.isConfirmed) {
       // Second dialog with a checkbox for double confirmation
       const secondResult = await Swal.fire({
@@ -707,24 +704,20 @@ const Reminders = () => {
         confirmButtonText: "Delete Voucher",
         cancelButtonText: "Cancel",
         preConfirm: () => {
-          const checkbox = document.getElementById(
-            "double-confirmation-checkbox"
-          );
+          const checkbox = document.getElementById('double-confirmation-checkbox');
           if (!checkbox.checked) {
-            Swal.showValidationMessage(
-              "You need to confirm the deletion by checking the box."
-            );
+            Swal.showValidationMessage("You need to confirm the deletion by checking the box.");
           }
           return checkbox.checked;
         },
       });
-
+  
       if (secondResult.isConfirmed) {
         try {
           await axios.delete(
             `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/delete/${id}`
           );
-
+  
           Swal.fire("Deleted!", "Vouchers deleted successfully.", "success");
         } catch (error) {
           console.error("Error deleting Vouchers:", error);
@@ -733,12 +726,12 @@ const Reminders = () => {
       }
     }
   };
-
+  
   return (
     <Paper
       elevation={2}
       style={{ padding: "20px" }}
-      sx={{ maxWidth: 1400, margin: "auto", mt: 1 }}
+      sx={{ maxWidth: 1300, margin: "auto", mt: 1 }}
       className="paperbg"
     >
       <Typography
@@ -860,7 +853,7 @@ const Reminders = () => {
 
       <TableContainer
         component={Paper}
-        sx={{ width: 1300, ml: 3 }}
+        sx={{ width: 1200, ml: 3 }}
         align="center"
       >
         <Table align="center">
@@ -1327,7 +1320,7 @@ const Reminders = () => {
               )}
             </DialogContent>
             <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
-              <Button
+            <Button
                 onClick={() =>
                   handleEditSubmit(document.getElementById("edit-expense-form"))
                 }
@@ -1343,14 +1336,16 @@ const Reminders = () => {
               >
                 Cancel
               </Button>
+           
             </DialogActions>
           </Dialog>
         </Grid>
       </Grid>
       <Grid container spacing={3} sx={{ mt: 4 }}>
         <Grid item xs={12} align="center">
+       
           <Typography variant="h6" sx={{ color: "green", fontWeight: "550" }}>
-            Document Charge
+         Document Charge
           </Typography>
           <Typography
             variant="h6"
@@ -1584,7 +1579,7 @@ const Reminders = () => {
               )}
             </DialogContent>
             <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
-              <Button
+            <Button
                 onClick={() =>
                   handleSalaryEditSubmit(
                     document.getElementById("edit-salary-form")
@@ -1602,6 +1597,7 @@ const Reminders = () => {
               >
                 Cancel
               </Button>
+             
             </DialogActions>
           </Dialog>
         </Grid>
@@ -1756,7 +1752,7 @@ const Reminders = () => {
               )}
             </DialogContent>
             <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
-              <Button
+            <Button
                 onClick={() =>
                   handleVoucherEditSubmit(
                     document.getElementById("edit-voucher-form")
@@ -1774,6 +1770,7 @@ const Reminders = () => {
               >
                 Cancel
               </Button>
+             
             </DialogActions>
           </Dialog>
         </Grid>
@@ -1870,8 +1867,8 @@ const Reminders = () => {
       </Grid>
       <Grid container spacing={3} sx={{ mt: 4 }}>
         <Grid item xs={12} align="center">
-          <Typography variant="h6" sx={{ color: "#D72122", fontWeight: "550" }}>
-            Paid Voucher to MD
+        <Typography variant="h6" sx={{ color: "#D72122", fontWeight: "550" }}>
+           Paid Voucher to MD
           </Typography>
           <Typography
             variant="h6"
@@ -2047,29 +2044,32 @@ const Reminders = () => {
           <Typography variant="h6" sx={{ color: "green", fontWeight: "550" }}>
             Appraisal Entries
           </Typography>
-
+        
           <Grid container>
-            <Grid item xs={6}>
-              <Typography
-                variant="h6"
-                className="daybook_font"
-                sx={{ color: "#48164e", ml: -3, fontWeight: 600 }}
-              >
-                Interest Total: {interestTotal}
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography
-                variant="h6"
-                className="daybook_font"
-                sx={{ color: "green" }}
-              >
-                <PaymentsIcon sx={{ mr: 1 }} />
-                <span style={{ fontWeight: "550" }}>Total:</span>{" "}
-                {appraisalTotal}
-              </Typography>
-            </Grid>
-          </Grid>
+          <Grid item xs={6} >
+    <Typography 
+      variant="h6" 
+      className="daybook_font" 
+      sx={{ color: "#48164e",ml:-3,fontWeight:600 }}
+    >
+      Interest Total: {interestTotal}
+    </Typography>
+  </Grid>
+  <Grid item xs={6}>
+    <Typography 
+      variant="h6" 
+      className="daybook_font" 
+      sx={{ color: "green" }}
+    >
+      <PaymentsIcon sx={{ mr: 1 }} />
+      <span style={{ fontWeight: "550" }}>
+        Total:
+      </span>{" "}
+      {appraisalTotal}
+    </Typography>
+  </Grid>
+
+</Grid>
           <TableContainer component={Paper} sx={{ width: 900 }}>
             <Table>
               <TableHead sx={{ backgroundColor: "#1784CC" }}>

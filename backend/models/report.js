@@ -13,12 +13,11 @@ const reportSchema = new mongoose.Schema({
   customerName: { type: String, default: '' },
   date: { type: Date, default: null },
   customerId: { type: String, default: '' },
-  loanNo: { type: String, default: '' },
+  loanNo: { type: String, default: 'KRT001' },
   mobileNumber: { type: String, default: '' },
   address: { type: String, default: '' },
   loanAmount: { type: Number, default: 0 },
   totalAmount: { type: Number, default: 0 },
-  // customerSign1: { type: String, default: '' },
   cashReceivedRs: { type: Number, default: 0 },
   rupeesInWords: { type: String, default: '' },
   paymentNo: { type: String, default: '' },
@@ -28,8 +27,6 @@ const reportSchema = new mongoose.Schema({
   interestPrinciple: { type: Number, default: 0 },
   balancePrinciple: { type: Number, default: 0 },
   remarks: { type: String, default: '' },
-  // customerSign: { type: String, default: '' }, // URL or path to the file
-  // cashierSign: { type: String, default: '' }, // URL or path to the file
   closedate: { type: Date, default: null },
   lastDateForLoan:{type:Date,default:null},
   jewels: [jewelSchema] 

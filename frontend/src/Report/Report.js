@@ -14,8 +14,8 @@ import {
   TableRow,
   Alert,
 } from "@mui/material";
-import { useLocation } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "./report.css";
 import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
@@ -117,8 +117,8 @@ const Report = () => {
     lastDateForLoan: false,
   });
   useEffect(() => {
-    const customerId = sessionStorage.getItem('customerId');
-    const loanNumber = sessionStorage.getItem('loanNumber');
+    const customerId = sessionStorage.getItem("customerId");
+    const loanNumber = sessionStorage.getItem("loanNumber");
 
     if (customerId && loanNumber) {
       setFormData((prevData) => ({
@@ -127,10 +127,10 @@ const Report = () => {
         loanNo: loanNumber,
       }));
       fetchReportData(loanNumber);
-      sessionStorage.removeItem('customerId');
-      sessionStorage.removeItem('loanNumber');
+      sessionStorage.removeItem("customerId");
+      sessionStorage.removeItem("loanNumber");
     } else {
-      navigate('/report'); 
+      navigate("/report");
     }
   }, [navigate]);
   const handleInputChange = (e) => {
@@ -152,7 +152,7 @@ const Report = () => {
         }));
       }
     }
-    
+
     if (name === "interestPrinciple") {
       if (parseFloat(value) > parseFloat(formData.interest)) {
         setValidationErrors((prevState) => ({
@@ -167,7 +167,6 @@ const Report = () => {
         }));
       }
     }
-    
 
     if (name === "date") {
       const formattedDate = value; // Already in the correct format
@@ -246,7 +245,6 @@ const Report = () => {
         const amountInWords = toWords(reportData.loanAmount);
 
         setFormData({
-        
           gross: reportData.gw,
           customerName: reportData.customerName,
           date: formattedDate,
@@ -451,14 +449,15 @@ const Report = () => {
         `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/byLoanNo/${formData.loanNo}`
       );
       const previousEntries = previousEntriesResponse.data;
-  
+
       previousEntries.sort(
         (a, b) => new Date(b.paymentDate) - new Date(a.paymentDate)
       );
-  
+
       let previousBalance = 0;
       let previousLoanAmountBalance = 0;
       let previousInterestBalAmount = 0;
+
       if (previousEntries.length > 0) {
         previousBalance = parseFloat(previousEntries[0].balance);
         previousLoanAmountBalance = parseFloat(
@@ -468,48 +467,76 @@ const Report = () => {
           previousEntries[0].interestbalamount
         );
       }
-  
-      const currentDate = new Date();
-      const lastDateForLoan = new Date(formData.lastDateForLoan);
-      const currentDateOnly = new Date(currentDate.toDateString());
-      const lastDateForLoanOnly = new Date(lastDateForLoan.toDateString());
-  
-      console.log("Current Date:", currentDateOnly);
-      console.log("Last Date For Loan:", lastDateForLoanOnly);
-  
-      if (currentDateOnly > lastDateForLoanOnly) {
-        console.log("Loan date crossed. No schema update or interest recalculation.");
-        // Removed logic for updating lastDateForLoan
-      } else {
-        console.log("No schema update or interest calculation needed today.");
-      }
-  
+
       const totalAmountNum = parseFloat(formData.totalAmount);
       const interestAmountNum = Math.floor(parseFloat(formData.interestamount));
-      const interestPrincipleNum = Math.floor(parseFloat(formData.interestPrinciple));
-      let loanamountbalance, interestbalamount;
-  
+      const interestPrincipleNum = Math.floor(
+        parseFloat(formData.interestPrinciple)
+      );
+
+      let principalAmount = parseFloat(formData.loanAmount);
+      let interestRate = parseFloat(formData.percent);
+      const numberOfDays = parseInt(formData.noOfDays);
+
+      if (
+        isNaN(principalAmount) ||
+        isNaN(interestRate) ||
+        isNaN(numberOfDays)
+      ) {
+        throw new Error("Invalid input: One or more values are not numbers.");
+      }
+
+      if (interestRate === 12) {
+        interestRate = 0.12;
+      } else if (interestRate === 18) {
+        interestRate = 0.18;
+      } else if (interestRate === 24) {
+        interestRate = 0.24;
+      } else {
+        throw new Error("Invalid interest rate: Must be 12, 18, or 24");
+      }
+
+      const dailyInterestRate = interestRate / 365;
+
+      // Use previousLoanAmountBalance if available, otherwise use principalAmount
+      const amountToCalculateInterest =
+        previousLoanAmountBalance > 0
+          ? previousLoanAmountBalance
+          : principalAmount;
+      const calculatedInterest =
+        amountToCalculateInterest * dailyInterestRate * numberOfDays;
+
+      const roundUpToNearestTen = (num) => Math.ceil(num / 10) * 10;
+
+      let interestbalamount = roundUpToNearestTen(calculatedInterest);
+      console.log(
+        "Calculated Interest (Rounded to nearest 10):",
+        interestbalamount
+      );
+
+      // If the interestPrinciple matches the calculated interest, set the interest balance to 0
+      if (interestPrincipleNum >= interestbalamount) {
+        interestbalamount = 0;
+      }
+
+      let loanamountbalance;
       if (previousEntries.length === 0) {
-        loanamountbalance = formData.loanAmount - interestAmountNum;
-        interestbalamount = formData.interest - interestPrincipleNum;
+        loanamountbalance = principalAmount - interestAmountNum;
       } else {
         loanamountbalance = previousLoanAmountBalance - interestAmountNum;
-        interestbalamount = previousInterestBalAmount - interestPrincipleNum;
       }
-  
+
       let newBalance;
+
       if (previousBalance === 0) {
-        newBalance = Math.floor(
-          totalAmountNum - (interestAmountNum + interestPrincipleNum)
-        );
+        newBalance = Math.floor(principalAmount - interestAmountNum);
+        console.log("New Balance when previousBalance is 0:", newBalance);
       } else {
-        newBalance = Math.floor(
-          previousBalance - (interestAmountNum + interestPrincipleNum)
-        );
+        newBalance = Math.floor(previousLoanAmountBalance - interestAmountNum);
+        console.log("New Balance when previousBalance is NOT 0:", newBalance);
       }
-  
-      console.log("Calculated New Balance:", newBalance);
-  
+      console.log("the new balance is :", newBalance);
+      // Prevent negative balance
       if (newBalance < 0) {
         Swal.fire({
           icon: "error",
@@ -518,39 +545,38 @@ const Report = () => {
         });
         return;
       }
-  
+
       newBalance = Math.max(newBalance, 0);
-  
+
+      // Check if account should be closed
+      if (newBalance === 0) {
+        Swal.fire({
+          icon: "info",
+          title: "Account Closed",
+          text: "The account is closed as the interest or loan balance is cleared.",
+        });
+        setSnackbarOpen(true);
+        setSnackbarMessage("Account Closed");
+        setFormDisabled(true);
+        setIsClosed(true);
+      }
+
       const newEntry = {
         ...formData,
         balance: newBalance,
         loanamountbalance: loanamountbalance,
         interestbalamount: interestbalamount,
       };
-  
+      console.log("The new entry is", newEntry);
+
       const updatedTableData = [newEntry, ...tableData];
       updatedTableData.sort(
         (a, b) => new Date(b.paymentDate) - new Date(a.paymentDate)
       );
-  
+
       setTableData(updatedTableData);
-  
-      if (newBalance === 0) {
-        Swal.fire({
-          icon: "info",
-          title: "Account Closed",
-          text: "The account is closed as the balance is zero.",
-        });
-        setSnackbarOpen(true);
-        setSnackbarMessage("Account Closed");
-        setFormDisabled(true);
-        setIsClosed(true);
-  
-        await axios.put(
-          `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/updateClosed/${formData.loanNo}`
-        );
-      }
-  
+
+      // Update ledger information
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/ledger/updateLoan/${formData.loanNo}`,
         {
@@ -558,15 +584,15 @@ const Report = () => {
           interestbalamount: interestbalamount,
         }
       );
-  
+
       Swal.fire({
         title: "Success!",
-        html: `<p>Payment completed</p>
-                <p style="color: red;">Don't forget to save</p>`,
+        html: `<p>Payment completed</p><p style="color: red;">Don't forget to save</p>`,
         icon: "success",
         confirmButtonText: "OK",
       });
-  
+
+      // Clear form data after successful operation
       setFormData({
         jewelNo: "",
         customerName: "",
@@ -601,6 +627,7 @@ const Report = () => {
         interestamount: "",
         lastDateForLoan: "",
       });
+
       setCustomersign(null);
       setCashiersign(null);
       setAuthorizedFile(null);
@@ -616,7 +643,7 @@ const Report = () => {
       });
     }
   };
-  
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -650,7 +677,6 @@ const Report = () => {
     } else {
       updatedErrors.noOfDays = false;
     }
-   
 
     setValidationErrors(updatedErrors);
 
@@ -686,29 +712,63 @@ const Report = () => {
 
   const handleSave = async (row) => {
     try {
-      const date = new Date(row.paymentDate);
+      // Validate and format date
+      if (!row || !row.paymentDate) {
+        throw new Error("Row data is invalid");
+      }
 
+      const date = new Date(row.paymentDate);
+      if (isNaN(date.getTime())) {
+        throw new Error("Invalid payment date provided");
+      }
       const formattedDate = date.toISOString().split("T")[0];
 
       const formattedRow = {
         ...row,
         paymentDate: formattedDate,
+        customerId: row.customerId,
+        noOfDays: row.noOfDays || 0,
+        interestbalamount: row.interestbalamount || 0,
+        loanamountbalance: row.loanamountbalance || 0,
+        interestPrincipleNum: row.interestPrinciple,
+        interestAmountNum: row.interestamount,
       };
 
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/add`,
-        formattedRow
+      // Check if the loan entry exists
+      const checkResponse = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/check/${formattedRow.loanNo}`
       );
 
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        text: "Data saved successfully",
-      });
-      setIsSaved(true);
-      setShowSaveButton(false); 
+      if (checkResponse.data.exists) {
+        // Update existing entry
+        const updateResponse = await axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/updateClosed/${formattedRow.loanNo}`,
+          formattedRow
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Data updated successfully",
+        });
+      } else {
+        // Create new entry
+        const createResponse = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/add`,
+          formattedRow
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Data saved successfully",
+        });
+      }
+
+      // Reset UI after saving
+      setShowSaveButton(false);
       setShowOtherButtons(true);
+      setIsSaved(true);
     } catch (error) {
+      console.error("Error saving data:", error);
       if (error.response && error.response.status === 400) {
         Swal.fire({
           icon: "error",
@@ -725,6 +785,7 @@ const Report = () => {
       setIsSaved(false);
     }
   };
+
   const fetchTableData = async (loanNo) => {
     try {
       const response = await axios.get(
@@ -741,7 +802,6 @@ const Report = () => {
         );
         const hasAnyEntryClosed = response.data.some((entry) => entry.isClosed);
 
-     
         setIsFormDisabled(hasClosedAccount || hasAnyEntryClosed);
 
         if (hasClosedAccount) {
@@ -779,7 +839,6 @@ const Report = () => {
             `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/delete/${id}`
           );
           Swal.fire("Deleted!", response.data.message, "success");
-         
         } catch (error) {
           console.error("Error deleting loan entry:", error);
           Swal.fire("Error!", "Failed to delete loan entry", "error");
@@ -916,7 +975,6 @@ const Report = () => {
                   }}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={3}>
                 <TextField
                   name="lastDateForLoan"
@@ -1052,7 +1110,6 @@ const Report = () => {
               LOAN DETAILS
             </Typography>
             <Grid container spacing={2} sx={{ mt: 0.5 }}>
-              
               <Grid item xs={12} md={4}>
                 <TextField
                   label="Rupees in Words"
@@ -1250,50 +1307,6 @@ const Report = () => {
                   ))}
                 </TableBody>
               </Table>
-           
-              {/* <Grid item xs={12} sm={6}>
-                {authorizedFile ? (
-                  <div style={{ position: "relative", textAlign: "center" }}>
-                    <img
-                      src={URL.createObjectURL(authorizedFile)}
-                      alt="Authorized Sign"
-                      style={{ width: "90%", height: "60px" }}
-                    />
-                    <IconButton
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        right: 0,
-                        background: "rgba(255, 255, 255, 0.7)",
-                      }}
-                      onClick={handleFileRemove(setAuthorizedFile)}
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  </div>
-                ) : (
-                  <>
-                    <Button
-                      variant="outlined"
-                      component="label"
-                      fullWidth
-                      className="sign-button"
-                    >
-                      Signature of the customer
-                      <input
-                        type="file"
-                        hidden
-                        onChange={handleFileChange(setAuthorizedFile)}
-                      />
-                    </Button>
-                    {validationErrors.authorizedFile && (
-                      <Typography color="error" variant="caption">
-                        signature of the customer is required
-                      </Typography>
-                    )}
-                  </>
-                )}
-              </Grid> */}
             </Grid>
 
             <Typography
@@ -1633,35 +1646,36 @@ const Report = () => {
                 )}
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-  <TextField
-    name="closedate"
-    label="Loan Closure Date"
-    type="date"
-    fullWidth
-    size="small" 
-    InputLabelProps={{
-      shrink: true,
-    }}
-    value={formData.closedate}
-    onChange={handleInputChange}
-    error={validationErrors.closedate}
-    helperText={
-      validationErrors.closedate ? "Loan Closure Date is required" : ""
-    }
-    sx={{
-      "& .MuiOutlinedInput-root": {
-        "& fieldset": {
-          borderColor: "black",
-        },
-      },
-  
-      "& .MuiInputBase-input": {
-        padding: "8px", 
-      },
-    }}
-  />
-</Grid>
+                <TextField
+                  name="closedate"
+                  label="Loan Closure Date"
+                  type="date"
+                  fullWidth
+                  size="small"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  value={formData.closedate}
+                  onChange={handleInputChange}
+                  error={validationErrors.closedate}
+                  helperText={
+                    validationErrors.closedate
+                      ? "Loan Closure Date is required"
+                      : ""
+                  }
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "black",
+                      },
+                    },
 
+                    "& .MuiInputBase-input": {
+                      padding: "8px",
+                    },
+                  }}
+                />
+              </Grid>
             </Grid>
             <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
               <Button
@@ -1741,7 +1755,7 @@ const Report = () => {
                       border: "1px solid black",
                       color: "white",
                       fontWeight: 600,
-                       width:'50px'
+                      width: "50px",
                     }}
                   >
                     No of Days
@@ -1778,7 +1792,7 @@ const Report = () => {
                       border: "1px solid black",
                       color: "white",
                       fontWeight: 600,
-                       width:'70px'
+                      width: "70px",
                     }}
                   >
                     Principal Balance
@@ -1788,10 +1802,10 @@ const Report = () => {
                       border: "1px solid black",
                       color: "white",
                       fontWeight: 600,
-                      width:'70px'
+                      width: "70px",
                     }}
                   >
-                    Interest  Balance
+                    Interest Balance
                   </TableCell>
                   <TableCell
                     sx={{ border: "1px solid black" }}

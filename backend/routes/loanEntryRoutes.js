@@ -63,18 +63,128 @@ router.get('/:loanNumber', async (req, res) => {
 router.put('/updateClosed/:loanNo', async (req, res) => {
   try {
     const { loanNo } = req.params;
-    const loanEntry = await LoanEntry.findOne({ loanNo });
-    const newBalance = loanEntry.balance;
+    const {
+      customerId,
+      noOfDays,
+      interestbalamount,
+      loanamountbalance,  // New loan amount balance for this new payment
+      interestPrincipleNum,
+      interestAmountNum,
+      paymentDate
+    } = req.body;
 
-    if (newBalance === 0) {
-      await LoanEntry.updateOne({ loanNo }, { isClosed: true });
+    // Validate customerId
+    if (!customerId) {
+      return res.status(400).send({ message: 'customerId is required' });
     }
 
-    res.status(200).send({ message: 'Loan entry updated successfully' });
+    // Validate paymentDate
+    if (!paymentDate || isNaN(new Date(paymentDate).getTime())) {
+      return res.status(400).send({ message: 'Invalid payment date provided' });
+    }
+
+    // Find the existing loan entry by loanNo (the latest one)
+    const existingLoanEntry = await LoanEntry.findOne({ loanNo }).sort({ paymentDate: -1 });
+
+    // If no existing loan entry, create a new one
+    if (!existingLoanEntry) {
+      const newLoanEntry = new LoanEntry({
+        loanNo,
+        balance: loanamountbalance || 0,  // New balance from the current payment
+        isClosed: false,
+        interestamount: interestAmountNum,
+        interestPrinciple: interestPrincipleNum,
+        noOfDays: noOfDays || 0,
+        interestbalamount: interestbalamount || 0,
+        loanamountbalance: loanamountbalance || 0,  // Initial balance from first payment
+        customerId,
+        paymentDate: new Date(paymentDate).toISOString().split('T')[0],
+      });
+
+      await newLoanEntry.save();
+      console.log("New loan entry created for loanNo:", loanNo);
+      return res.status(201).send({
+        message: 'New loan entry created successfully',
+        loanEntry: newLoanEntry
+      });
+    }
+
+    // If an existing loan entry is found, do NOT update it (leave it as is)
+
+    // Check if loan is already closed
+    if (existingLoanEntry.isClosed) {
+      return res.status(400).send({
+        message: 'Cannot update a closed loan entry',
+      });
+    }
+
+    // Use the existing loanamountbalance for reference, but do not modify it
+    const previousBalance = existingLoanEntry.loanamountbalance;
+
+    // Calculate the new balance (without modifying the existing entry)
+    const newBalance = previousBalance - interestAmountNum;
+
+    // Create a new payment entry without modifying the previous one
+    const paymentEntry = new LoanEntry({
+      loanNo,
+      balance: newBalance >= 0 ? newBalance : 0,  // New balance after payment
+      isClosed: newBalance === 0,
+      interestamount: interestAmountNum,
+      interestPrinciple: interestPrincipleNum || 0,
+      noOfDays: noOfDays || 0,
+      interestbalamount: interestbalamount || 0,
+      loanamountbalance: loanamountbalance,  // This is the new loan amount balance (for this payment)
+      customerId,
+      paymentDate: new Date(paymentDate).toISOString().split('T')[0],
+    });
+
+    await paymentEntry.save();
+    console.log("New payment entry created for loanNo:", loanNo);
+
+    return res.status(201).send({
+      message: 'Payment entry created successfully',
+      loanEntry: paymentEntry,
+      // Not sending updatedLoanEntry as nothing is updated in the existing entry
+    });
+
   } catch (error) {
-    res.status(500).send({ message: 'Error updating loan entry' });
+    console.error("Error updating loan entry:", error);
+    return res.status(500).send({ message: 'Error updating loan entry', error: error.message });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+router.get('/check/:loanNo', async (req, res) => {
+  try {
+    const { loanNo } = req.params;
+
+    // Query the database for the loan entry
+    const entry = await LoanEntry.findOne({ loanNo: loanNo });
+
+    if (entry) {
+      return res.json({ exists: true });
+    } else {
+      return res.json({ exists: false });
+    }
+  } catch (error) {
+    console.error('Error checking loan entry:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
+
+
 // Example update function
 router.put("/updateLoan/:loanNo", async (req, res) => {
   const { loanNo } = req.params;
