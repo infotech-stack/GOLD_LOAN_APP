@@ -135,120 +135,166 @@ const Customer = ({ entry }) => {
     // Initialize counts for filtered totals
     let liveAccountsCount = 0;
     let closedAccountsCount = 0;
+    let lglCount = 0;
+    let mglCount = 0;
+    let hglCount = 0;
 
     // Calculate live and closed accounts based on the filtered entries
     totalFilteredEntries.forEach((entry) => {
-      if (entry.status === "Closed") {
-        closedAccountsCount++;
-      } else if (entry.status === "Live") {
-        liveAccountsCount++;
-      }
+        // Increment counts based on status and schema
+        if (entry.status.toLowerCase() === "closed") {
+            closedAccountsCount++;
+            if (entry.schema) {
+                if (entry.schema.toUpperCase() === "LGL") lglCount++;
+                if (entry.schema.toUpperCase() === "MGL") mglCount++;
+                if (entry.schema.toUpperCase() === "HGL") hglCount++;
+            }
+        } else if (entry.status.toLowerCase() === "live") {
+            liveAccountsCount++;
+            if (entry.schema) {
+                if (entry.schema.toUpperCase() === "LGL") lglCount++;
+                if (entry.schema.toUpperCase() === "MGL") mglCount++;
+                if (entry.schema.toUpperCase() === "HGL") hglCount++;
+            }
+        }
     });
 
-    // Only update the state if the counts have actually changed
-    if (
-      liveAccountsCount !== filteredTotals.Live ||
-      closedAccountsCount !== filteredTotals.Closed
-    ) {
-      setFilteredTotals({
-        LGL: filteredTotals.LGL,
-        MGL: filteredTotals.MGL,
-        HGL: filteredTotals.HGL,
+    // Logic for modifying totals based on search term
+    let totals = {
+        LGL: lglCount,
+        MGL: mglCount,
+        HGL: hglCount,
         Live: liveAccountsCount,
         Closed: closedAccountsCount,
-      });
+    };
+
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    if (lowerSearchTerm === "lgl" || lowerSearchTerm === "mgl" || lowerSearchTerm === "hgl") {
+        // If searching for a specific schema, set the counts for all to be the same
+        const specificCount = totals[lowerSearchTerm.toUpperCase()] || 0;
+        totals = {
+            LGL: specificCount,
+            MGL: specificCount,
+            HGL: specificCount,
+            Live: liveAccountsCount,
+            Closed: closedAccountsCount,
+        };
     }
-  }, [searchTerm, filteredEntries]);
 
-  const fetchLedgers = async () => {
-    try {
-      // Fetch ledger entries
-      const ledgerResponse = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/ledger/all`
-      );
-      const formattedLedgerEntries = ledgerResponse.data
-        .reverse()
-        .map((entry) => ({
-          ...entry,
-          date: formatDate(entry.date),
-          lastDateForLoan: formatDate(entry.lastDateForLoan),
-        }));
-
-      // Fetch loan entries
-      const loanResponse = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/all`
-      );
-      const loanData = loanResponse.data;
-
-      // Group loans by loanNo, sort by paymentDate, and get the latest entry for each loan
-      const loansByNumber = loanData.reduce((acc, loan) => {
-        if (!acc[loan.loanNo]) {
-          acc[loan.loanNo] = [];
+    // Only set totals if there is a change
+    setTotals((prevTotals) => {
+        if (
+            prevTotals.LGL !== totals.LGL ||
+            prevTotals.MGL !== totals.MGL ||
+            prevTotals.HGL !== totals.HGL ||
+            prevTotals.Live !== totals.Live ||
+            prevTotals.Closed !== totals.Closed
+        ) {
+            return totals;
         }
-        acc[loan.loanNo].push(loan);
-        return acc;
-      }, {});
+        return prevTotals;
+    });
+}, [searchTerm, filteredEntries]);
 
-      // Sort loan entries by date and get the latest entry
-      const latestLoans = Object.keys(loansByNumber).reduce((acc, loanNo) => {
-        const sortedEntries = loansByNumber[loanNo].sort(
-          (a, b) => new Date(b.paymentDate) - new Date(a.paymentDate)
-        );
-        acc[loanNo] = sortedEntries[0]; // Pick the latest payment entry
-        return acc;
-      }, {});
 
-      const enrichedLedgerEntries = formattedLedgerEntries.map(
-        (ledgerEntry) => {
-          const matchingLoan = latestLoans[ledgerEntry.loanNumber];
-          return {
-            ...ledgerEntry,
-            status:
-              matchingLoan && matchingLoan.balance === 0 ? "Closed" : "Live",
-          };
-        }
+
+
+
+
+
+
+
+
+const fetchLedgers = async () => {
+  try {
+    // Fetch ledger entries
+    const ledgerResponse = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/api/ledger/all`
+    );
+    const formattedLedgerEntries = ledgerResponse.data
+      .reverse()
+      .map((entry) => ({
+        ...entry,
+        date: formatDate(entry.date),
+        lastDateForLoan: formatDate(entry.lastDateForLoan),
+      }));
+
+    // Fetch loan entries
+    const loanResponse = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/all`
+    );
+    const loanData = loanResponse.data;
+
+    // Group loans by loanNo, sort by paymentDate, and get the latest entry for each loan
+    const loansByNumber = loanData.reduce((acc, loan) => {
+      if (!acc[loan.loanNo]) {
+        acc[loan.loanNo] = [];
+      }
+      acc[loan.loanNo].push(loan);
+      return acc;
+    }, {});
+
+    // Sort loan entries by date and get the latest entry
+    const latestLoans = Object.keys(loansByNumber).reduce((acc, loanNo) => {
+      const sortedEntries = loansByNumber[loanNo].sort(
+        (a, b) => new Date(b.paymentDate) - new Date(a.paymentDate)
       );
+      acc[loanNo] = sortedEntries[0]; // Pick the latest payment entry
+      return acc;
+    }, {});
 
-      // Set the enriched ledger entries to state
-      setLedgerEntries(enrichedLedgerEntries);
+    const enrichedLedgerEntries = formattedLedgerEntries.map(
+      (ledgerEntry) => {
+        const matchingLoan = latestLoans[ledgerEntry.loanNumber];
+        return {
+          ...ledgerEntry,
+          status:
+            matchingLoan && matchingLoan.balance === 0 ? "Closed" : "Live",
+        };
+      }
+    );
 
-      // Set initial totals
-      const totalLedgerEntries = enrichedLedgerEntries.length;
+    // Set the enriched ledger entries to state
+    setLedgerEntries(enrichedLedgerEntries);
 
-      const ledgerTotals = enrichedLedgerEntries.reduce(
-        (acc, entry) => {
-          acc.LGL += entry.schema === "LGL" ? 1 : 0;
-          acc.MGL += entry.schema === "MGL" ? 1 : 0;
-          acc.HGL += entry.schema === "HGL" ? 1 : 0;
-          return acc;
-        },
-        { LGL: 0, MGL: 0, HGL: 0 }
-      );
+    // Calculate totals and account counts
+    const totalLedgerEntries = enrichedLedgerEntries.length;
 
-      // Calculate closed accounts
-      const closedAccountsCount = Object.values(latestLoans).filter(
-        (entry) => entry.balance === 0
-      ).length;
+    const ledgerTotals = enrichedLedgerEntries.reduce(
+      (acc, entry) => {
+        acc.LGL += entry.schema === "LGL" ? 1 : 0;
+        acc.MGL += entry.schema === "MGL" ? 1 : 0;
+        acc.HGL += entry.schema === "HGL" ? 1 : 0;
+        return acc;
+      },
+      { LGL: 0, MGL: 0, HGL: 0 }
+    );
 
-      // Calculate live accounts
-      const liveAccountsCount = totalLedgerEntries - closedAccountsCount;
+    // Calculate closed and live accounts
+    const closedAccountsCount = Object.values(latestLoans).filter(
+      (entry) => entry.balance === 0
+    ).length;
 
-      // Update totals state
-      setTotals({
-        LGL: ledgerTotals.LGL,
-        MGL: ledgerTotals.MGL,
-        HGL: ledgerTotals.HGL,
-        Live: liveAccountsCount,
-        Closed: closedAccountsCount,
-      });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+    const liveAccountsCount = totalLedgerEntries - closedAccountsCount;
 
-  useEffect(() => {
-    fetchLedgers();
-  }, [dispatch]);
+    // Update totals state
+    setTotals({
+      LGL: ledgerTotals.LGL,
+      MGL: ledgerTotals.MGL,
+      HGL: ledgerTotals.HGL,
+      Live: liveAccountsCount,
+      Closed: closedAccountsCount,
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+useEffect(() => {
+  fetchLedgers();
+  // Only run on mount, hence an empty dependency array
+}, []);
+
 
   const handleAddLoanClick = (customerId) => {
     setSelectedCustomerId(customerId);
@@ -270,12 +316,38 @@ const Customer = ({ entry }) => {
       { totalLoanAmount: 0, totalInterest: 0 }
     );
   };
-
   const totals2 = calculateTotals(Object.values(filteredEntries).flat());
 
   const combinedTotal = totals2.totalLoanAmount + totals2.totalInterest;
   const TotalLoanAmount = totals2.totalLoanAmount; // Corrected to use totals
-  const TotalInterestAmount = totals2.totalInterest;
+  const TotalInterestAmount = totals2.totalInterest
+  // Assuming `filteredEntries` contains all ledger entries
+  const allEntries = Object.values(filteredEntries).flat();
+  
+  // Calculate totals for MGL, LGL, and HGL
+  const mglEntries = allEntries.filter(entry => entry.schema === 'MGL');
+  const hglEntries = allEntries.filter(entry => entry.schema === 'HGL');
+  const lglEntries = allEntries.filter(entry => entry.schema === 'LGL');
+  
+  const mglTotals = calculateTotals(mglEntries);
+  const hglTotals = calculateTotals(hglEntries);
+  const lglTotals = calculateTotals(lglEntries);
+  
+  // Now you can use the totals
+  const MGLTotalAmount = mglTotals.totalLoanAmount;
+  const MGLTotalInterest = mglTotals.totalInterest;
+  const HGLTotalAmount = hglTotals.totalLoanAmount;
+  const HGLTotalInterest = hglTotals.totalInterest;
+  const LGLTotalAmount = lglTotals.totalLoanAmount;
+  const LGLTotalInterest = lglTotals.totalInterest;
+  
+  // Combined totals for each schema
+  const MGLCombinedTotal = MGLTotalAmount + MGLTotalInterest;
+  const HGLCombinedTotal = HGLTotalAmount + HGLTotalInterest;
+  const LGLCombinedTotal = LGLTotalAmount + LGLTotalInterest;
+  
+ 
+  
 
   const handleDelete = async (entry) => {
     const { loanNumber } = entry;
@@ -731,78 +803,50 @@ const Customer = ({ entry }) => {
         </Table>
       </TableContainer>
       <Box
-        display="flex"
-        flexDirection="row"
-        justifyContent="center"
-        alignItems="center"
-        margin="1px 0"
-        sx={{
-          mt: 2,
-          mb: -1,
-        }}
-      >
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          className="typo_box"
-          sx={{
-            backgroundColor: "#1784CC",
-            color: "white",
-            borderRadius: "7px",
-            fontWeight: 800,
-            width: "290px",
-            padding: "4px",
-            boxShadow: 1,
-            mr: 7,
-          }}
-        >
-          <Typography className="typo_total" sx={{ fontWeight: "600" }}>
-            Loan Amount: {TotalLoanAmount}
-          </Typography>
-        </Box>
+  display="flex"
+  flexDirection="row"
+  justifyContent="center"
+  alignItems="center"
+  margin="1px 0"
+  sx={{
+    mt: 2,
+    mb: -1,
+  }}
+>
+  {[
+    { label: "Loan Amount", value: TotalLoanAmount },
+    { label: "Interest Amount", value: TotalInterestAmount },
+    { label: "Total Amount", value: combinedTotal.toLocaleString() },
+    { label: "LGL  Amount", value: LGLCombinedTotal.toLocaleString() },
+    { label: "MGL  Amount", value: MGLCombinedTotal.toLocaleString() },
+    { label: "HGL Amount", value: HGLCombinedTotal.toLocaleString() },
+  ].map(({ label, value }, index) => (
+    <Box
+      key={index}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      className="typo_box"
+      sx={{
+        backgroundColor: "#1784CC",
+        color: "white",
+        borderRadius: "7px",
+        fontWeight: 800,
+        width: "290px",
+        padding: "4px",
+        boxShadow: 1,
+        mr: index < 5 ? 7 : 0, 
+      }}
+    >
+      <Typography className="typo_total" sx={{ fontWeight: "600" }}>
+        {label}: {value}
+      </Typography>
+    </Box>
+  ))}
+</Box>
 
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          className="typo_box"
-          sx={{
-            backgroundColor: "#1784CC",
-            color: "white",
-            borderRadius: "7px",
-            fontWeight: 800,
-            width: "290px",
-            padding: "4px",
-            boxShadow: 1,
-            mr: 7,
-          }}
-        >
-          <Typography className="typo_total" sx={{ fontWeight: "600" }}>
-            Interest Amount: {TotalInterestAmount}
-          </Typography>
-        </Box>
 
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          className="typo_box"
-          sx={{
-            backgroundColor: "#1784CC",
-            color: "white",
-            borderRadius: "7px",
-            fontWeight: 800,
-            width: "290px",
-            padding: "4px",
-            boxShadow: 1,
-          }}
-        >
-          <Typography className="typo_total" sx={{ fontWeight: "600" }}>
-            Total Amount: {combinedTotal.toLocaleString()}
-          </Typography>
-        </Box>
-      </Box>
+
 
       <Dialog
         open={openAddLoanDialog}
