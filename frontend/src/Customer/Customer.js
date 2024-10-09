@@ -179,6 +179,24 @@ const Customer = ({ entry }) => {
             Live: liveAccountsCount,
             Closed: closedAccountsCount,
         };
+    } else if (lowerSearchTerm === "live") {
+        // If searching for "live", set only the Live total
+        totals = {
+            LGL: lglCount,
+            MGL: mglCount,
+            HGL: hglCount,
+            Live: liveAccountsCount,
+            Closed: 0,  // Set Closed to 0 as only Live is searched
+        };
+    } else if (lowerSearchTerm === "closed") {
+        // If searching for "closed", set only the Closed total
+        totals = {
+            LGL: lglCount,
+            MGL: mglCount,
+            HGL: hglCount,
+            Live: 0,  // Set Live to 0 as only Closed is searched
+            Closed: closedAccountsCount,
+        };
     }
 
     // Only set totals if there is a change
@@ -195,6 +213,7 @@ const Customer = ({ entry }) => {
         return prevTotals;
     });
 }, [searchTerm, filteredEntries]);
+
 
 
 
@@ -491,7 +510,7 @@ useEffect(() => {
             style={{ fontSize: "16px", marginRight: "6px" }}
           />
           <Typography variant="subtitle2">
-            Live: {searchTerm ? filteredTotals.Live : totals.Live}
+            Live: { totals.Live}
           </Typography>
         </div>
         <div
@@ -506,7 +525,7 @@ useEffect(() => {
             style={{ fontSize: "16px", marginRight: "6px" }}
           />
           <Typography variant="subtitle2">
-            Closed: {searchTerm ? filteredTotals.Closed : totals.Closed}
+            Closed: {totals.Closed}
           </Typography>
         </div>
       </div>
