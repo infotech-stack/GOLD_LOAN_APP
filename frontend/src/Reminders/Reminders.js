@@ -16,7 +16,12 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  FormControl,
+  MenuItem,
+  InputLabel,
+  Select,
 } from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"; // Add this import
 import DatePicker from "react-datepicker";
 import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
@@ -34,6 +39,9 @@ const Reminders = () => {
   const [vouchers, setVouchers] = useState([]);
   const [ledgerEntries, setLedgerEntries] = useState([]);
   const [apraisalentries, setApraisalentries] = useState([]);
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getFullYear().toString()
+  );
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const { updateBalances } = useContext(BalanceContext);
@@ -89,14 +97,31 @@ const Reminders = () => {
   };
 
   const filterDataByDateRange = (data) => {
-    if (!startDate || !endDate) return data;
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
+    if (!selectedYear) return data;
+
+    // Convert selected year to number
+    const year = Number(selectedYear);
 
     return data.filter((item) => {
       const dateField = new Date(item.date || item.paymentDate);
+      const itemYear = dateField.getFullYear();
+
+      // Check if the item matches the selected year
+      if (itemYear !== year) {
+        return false;
+      }
+
+      // If no startDate or endDate is provided, return items for the selected year only
+      if (!startDate || !endDate) {
+        return true;
+      }
+
+      // Apply date range filtering if startDate and endDate are provided
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+
       return dateField >= start && dateField <= end;
     });
   };
@@ -148,6 +173,12 @@ const Reminders = () => {
   const filterAndAggregateData = () => {
     const filteredDates = allDates.filter((date) => {
       const dateField = new Date(date);
+      const year = dateField.getFullYear();
+
+      // Filter by selected year
+      if (selectedYear && year !== Number(selectedYear)) {
+        return false;
+      }
       return (
         !startDate ||
         !endDate ||
@@ -155,11 +186,34 @@ const Reminders = () => {
           dateField <= new Date(endDate).setHours(23, 59, 59, 999))
       );
     });
+    const calculateBalanceBeforeStartDate = (startDate) => {
+      if (!startDate) return 0;
+
+      const filteredDatesBeforeStart = allDates.filter((date) => {
+        const dateField = new Date(date);
+        return dateField < new Date(startDate).setHours(0, 0, 0, 0);
+      });
+
+      let balance = 0;
+      filteredDatesBeforeStart.forEach((date) => {
+        balance = calculateClosingBalance(balance, date);
+      });
+
+      return balance;
+    };
 
     let prevClosingBalance = 0; // Start with zero or initial balance
     let openingBalanceInitialized = false;
+    let lastProcessedYear = null; // Track the last year processed
 
     return filteredDates.map((date) => {
+      const currentYear = new Date(date).getFullYear();
+
+      // Reset balances for a new year
+      if (lastProcessedYear && currentYear !== lastProcessedYear) {
+        prevClosingBalance = 0; // Reset the closing balance for a new year
+      }
+
       if (!openingBalanceInitialized) {
         const balanceBeforeStartDate =
           calculateBalanceBeforeStartDate(startDate);
@@ -170,6 +224,7 @@ const Reminders = () => {
       const openingBalance = prevClosingBalance;
       const closingBalance = calculateClosingBalance(openingBalance, date);
       prevClosingBalance = closingBalance;
+      lastProcessedYear = currentYear; // Update the last processed year
 
       return {
         date,
@@ -180,7 +235,10 @@ const Reminders = () => {
         },
         salaries: aggregatedSalaries[date] || { date: date, totalAmount: 0 },
         vouchers: aggregatedVouchers[date] || { date: date, totalAmount: 0 },
-        paidvoucher:aggregatedPaidVouchers[date] ||{ date: date, totalAmount: 0 },
+        paidvoucher: aggregatedPaidVouchers[date] || {
+          date: date,
+          totalAmount: 0,
+        },
         doccharge: aggregatedDocCharges[date] || { date: date, totalAmount: 0 },
         ledger: aggregatedLedger[date] || { date: date, totalAmount: 0 },
         appraisals: aggregatedAppraisals[date] || {
@@ -192,22 +250,6 @@ const Reminders = () => {
     });
   };
 
-  const calculateBalanceBeforeStartDate = (startDate) => {
-    if (!startDate) return 0;
-
-    const filteredDatesBeforeStart = allDates.filter((date) => {
-      const dateField = new Date(date);
-      return dateField < new Date(startDate).setHours(0, 0, 0, 0);
-    });
-
-    let balance = 0;
-    filteredDatesBeforeStart.forEach((date) => {
-      balance = calculateClosingBalance(balance, date);
-    });
-
-    return balance;
-  };
-
   const calculateClosingBalance = (prevClosingBalance, date) => {
     const openingBalance = prevClosingBalance;
     const dayToDayTotal = aggregatedExpenses[date]?.totalAmount || 0;
@@ -216,7 +258,7 @@ const Reminders = () => {
     const ledgerTotal = aggregatedLedger[date]?.totalAmount || 0;
     const appraisalTotal = aggregatedAppraisals[date]?.totalAmount || 0;
     const docChargeTotal = aggregatedDocCharges[date]?.totalAmount || 0;
-    const paidVoucherTotal=aggregatedPaidVouchers[date]?.totalAmount ||0;
+    const paidVoucherTotal = aggregatedPaidVouchers[date]?.totalAmount || 0;
 
     return (
       openingBalance +
@@ -224,7 +266,7 @@ const Reminders = () => {
       docChargeTotal +
       appraisalTotal -
       dayToDayTotal -
-      paidVoucherTotal-
+      paidVoucherTotal -
       salaryTotal -
       ledgerTotal
     );
@@ -677,7 +719,7 @@ const Reminders = () => {
       });
     }
   };
- 
+
   const handleDelete6 = async (id) => {
     // First confirmation dialog
     const result = await Swal.fire({
@@ -689,7 +731,7 @@ const Reminders = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
     });
-  
+
     if (result.isConfirmed) {
       // Second dialog with a checkbox for double confirmation
       const secondResult = await Swal.fire({
@@ -704,20 +746,24 @@ const Reminders = () => {
         confirmButtonText: "Delete Voucher",
         cancelButtonText: "Cancel",
         preConfirm: () => {
-          const checkbox = document.getElementById('double-confirmation-checkbox');
+          const checkbox = document.getElementById(
+            "double-confirmation-checkbox"
+          );
           if (!checkbox.checked) {
-            Swal.showValidationMessage("You need to confirm the deletion by checking the box.");
+            Swal.showValidationMessage(
+              "You need to confirm the deletion by checking the box."
+            );
           }
           return checkbox.checked;
         },
       });
-  
+
       if (secondResult.isConfirmed) {
         try {
           await axios.delete(
             `${process.env.REACT_APP_BACKEND_URL}/api/loanEntry/delete/${id}`
           );
-  
+
           Swal.fire("Deleted!", "Vouchers deleted successfully.", "success");
         } catch (error) {
           console.error("Error deleting Vouchers:", error);
@@ -726,22 +772,59 @@ const Reminders = () => {
       }
     }
   };
-  
+
   return (
     <Paper
       elevation={2}
       style={{ padding: "20px" }}
-      sx={{ maxWidth: 1300, margin: "auto", mt: 1 }}
+      sx={{ maxWidth: 1370, margin: "auto", mt: 1 }}
       className="paperbg"
     >
       <Typography
         variant="h6"
         align="center"
-        sx={{ color: "#D72122", fontWeight: "550", mb: 2 }}
+        sx={{ color: "#D72122", fontWeight: "550", mb: 3 }}
       >
         DAY BOOK
       </Typography>
+      <Grid item xs={12} sm={3} sx={{ mt: -7, ml: 130 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Typography for the label */}
+          <Typography
+            variant="h6"
+            style={{ fontWeight: 600, fontSize: "16px", color: "green" }}
+          >
+            Select Year:
+          </Typography>
 
+          {/* FormControl to style the select dropdown */}
+          <FormControl variant="outlined" style={{ minWidth: 120 }}>
+            <Select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              id="year-select"
+              IconComponent={(props) => <ArrowDropDownIcon {...props} />}
+              labelId="year-select-label"
+              style={{
+                backgroundColor: "#f4f4f4",
+                borderRadius: "5px",
+                padding: "1px 1px",
+                fontSize: "14px",
+                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                border: "1px solid #ccc",
+                width: "120px",
+                height: "35px",
+              }}
+            >
+              {[2022, 2023, 2024, 2025, 2026, 2027].map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+      </Grid>
       <Grid container spacing={3} justifyContent="center" sx={{ mb: 4, ml: 2 }}>
         <Grid item xs={12} sm={5}>
           <Typography variant="body1">Start Date:</Typography>
@@ -761,6 +844,7 @@ const Reminders = () => {
             isClearable
           />
         </Grid>
+
         <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
           <Button
             type="submit"
@@ -774,7 +858,6 @@ const Reminders = () => {
           </Button>
         </Grid>
       </Grid>
-
       {startDate && endDate ? (
         <Grid container spacing={3} sx={{ ml: 2 }}>
           <Grid item xs={12} sm={4}>
@@ -853,7 +936,7 @@ const Reminders = () => {
 
       <TableContainer
         component={Paper}
-        sx={{ width: 1200, ml: 3 }}
+        sx={{ width: 1270, ml: 3 }}
         align="center"
       >
         <Table align="center">
@@ -1320,7 +1403,7 @@ const Reminders = () => {
               )}
             </DialogContent>
             <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
-            <Button
+              <Button
                 onClick={() =>
                   handleEditSubmit(document.getElementById("edit-expense-form"))
                 }
@@ -1336,16 +1419,14 @@ const Reminders = () => {
               >
                 Cancel
               </Button>
-           
             </DialogActions>
           </Dialog>
         </Grid>
       </Grid>
       <Grid container spacing={3} sx={{ mt: 4 }}>
         <Grid item xs={12} align="center">
-       
           <Typography variant="h6" sx={{ color: "green", fontWeight: "550" }}>
-         Document Charge
+            Document Charge
           </Typography>
           <Typography
             variant="h6"
@@ -1579,7 +1660,7 @@ const Reminders = () => {
               )}
             </DialogContent>
             <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
-            <Button
+              <Button
                 onClick={() =>
                   handleSalaryEditSubmit(
                     document.getElementById("edit-salary-form")
@@ -1597,7 +1678,6 @@ const Reminders = () => {
               >
                 Cancel
               </Button>
-             
             </DialogActions>
           </Dialog>
         </Grid>
@@ -1752,7 +1832,7 @@ const Reminders = () => {
               )}
             </DialogContent>
             <DialogActions sx={{ justifyContent: "center", mb: 2 }}>
-            <Button
+              <Button
                 onClick={() =>
                   handleVoucherEditSubmit(
                     document.getElementById("edit-voucher-form")
@@ -1770,7 +1850,6 @@ const Reminders = () => {
               >
                 Cancel
               </Button>
-             
             </DialogActions>
           </Dialog>
         </Grid>
@@ -1867,8 +1946,8 @@ const Reminders = () => {
       </Grid>
       <Grid container spacing={3} sx={{ mt: 4 }}>
         <Grid item xs={12} align="center">
-        <Typography variant="h6" sx={{ color: "#D72122", fontWeight: "550" }}>
-           Paid Voucher to MD
+          <Typography variant="h6" sx={{ color: "#D72122", fontWeight: "550" }}>
+            Paid Voucher to MD
           </Typography>
           <Typography
             variant="h6"
@@ -2044,32 +2123,29 @@ const Reminders = () => {
           <Typography variant="h6" sx={{ color: "green", fontWeight: "550" }}>
             Appraisal Entries
           </Typography>
-        
-          <Grid container>
-          <Grid item xs={6} >
-    <Typography 
-      variant="h6" 
-      className="daybook_font" 
-      sx={{ color: "#48164e",ml:-3,fontWeight:600 }}
-    >
-      Interest Total: {interestTotal}
-    </Typography>
-  </Grid>
-  <Grid item xs={6}>
-    <Typography 
-      variant="h6" 
-      className="daybook_font" 
-      sx={{ color: "green" }}
-    >
-      <PaymentsIcon sx={{ mr: 1 }} />
-      <span style={{ fontWeight: "550" }}>
-        Total:
-      </span>{" "}
-      {appraisalTotal}
-    </Typography>
-  </Grid>
 
-</Grid>
+          <Grid container>
+            <Grid item xs={6}>
+              <Typography
+                variant="h6"
+                className="daybook_font"
+                sx={{ color: "#48164e", ml: -3, fontWeight: 600 }}
+              >
+                Interest Total: {interestTotal}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography
+                variant="h6"
+                className="daybook_font"
+                sx={{ color: "green" }}
+              >
+                <PaymentsIcon sx={{ mr: 1 }} />
+                <span style={{ fontWeight: "550" }}>Total:</span>{" "}
+                {appraisalTotal}
+              </Typography>
+            </Grid>
+          </Grid>
           <TableContainer component={Paper} sx={{ width: 900 }}>
             <Table>
               <TableHead sx={{ backgroundColor: "#1784CC" }}>
