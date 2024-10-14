@@ -174,7 +174,7 @@ const Reminders = () => {
     const filteredDates = allDates.filter((date) => {
       const dateField = new Date(date);
       const year = dateField.getFullYear();
-
+  
       // Filter by selected year
       if (selectedYear && year !== Number(selectedYear)) {
         return false;
@@ -186,70 +186,57 @@ const Reminders = () => {
           dateField <= new Date(endDate).setHours(23, 59, 59, 999))
       );
     });
-    const calculateBalanceBeforeStartDate = (startDate) => {
-      if (!startDate) return 0;
-
-      const filteredDatesBeforeStart = allDates.filter((date) => {
-        const dateField = new Date(date);
-        return dateField < new Date(startDate).setHours(0, 0, 0, 0);
-      });
-
-      let balance = 0;
-      filteredDatesBeforeStart.forEach((date) => {
-        balance = calculateClosingBalance(balance, date);
-      });
-
-      return balance;
-    };
-
+  
     let prevClosingBalance = 0; // Start with zero or initial balance
-    let openingBalanceInitialized = false;
-    let lastProcessedYear = null; // Track the last year processed
-
-    return filteredDates.map((date) => {
+    let lastYearClosingBalance = 0; // Track the last year's closing balance
+  
+    // Calculate last year's closing balance
+    const lastYearDates = allDates.filter((date) => {
+      const dateField = new Date(date);
+      return dateField.getFullYear() < new Date(filteredDates[0]).getFullYear();
+    });
+  
+    lastYearDates.forEach((date) => {
+      lastYearClosingBalance = calculateClosingBalance(lastYearClosingBalance, date);
+    });
+  
+    // Log the correct last year closing balance
+    console.log('Last Year Closing Balance:', lastYearClosingBalance);
+  
+    return filteredDates.map((date, index) => {
       const currentYear = new Date(date).getFullYear();
-
-      // Reset balances for a new year
-      if (lastProcessedYear && currentYear !== lastProcessedYear) {
-        prevClosingBalance = 0; // Reset the closing balance for a new year
+  
+      // For the first date, always set the opening balance to last year's closing balance
+      if (index === 0) {
+        prevClosingBalance = lastYearClosingBalance;  // Use last year's closing balance
       }
-
-      if (!openingBalanceInitialized) {
-        const balanceBeforeStartDate =
-          calculateBalanceBeforeStartDate(startDate);
-        prevClosingBalance = balanceBeforeStartDate;
-        openingBalanceInitialized = true;
-      }
-
+  
+      // Set opening balance for the current date
       const openingBalance = prevClosingBalance;
       const closingBalance = calculateClosingBalance(openingBalance, date);
+      
+      // Update prevClosingBalance for the next date
       prevClosingBalance = closingBalance;
-      lastProcessedYear = currentYear; // Update the last processed year
-
+  
+      // Log for debugging purposes
+      console.log(`Date: ${date}, Opening Balance: ${openingBalance}, Closing Balance: ${closingBalance}`);
+  
       return {
         date,
-        openingBalance: formatNumber(openingBalance),
-        dayToDayExpenses: aggregatedExpenses[date] || {
-          date: date,
-          totalAmount: 0,
-        },
+        openingBalance: formatNumber(openingBalance),  // Use correct opening balance
+        dayToDayExpenses: aggregatedExpenses[date] || { date: date, totalAmount: 0 },
         salaries: aggregatedSalaries[date] || { date: date, totalAmount: 0 },
         vouchers: aggregatedVouchers[date] || { date: date, totalAmount: 0 },
-        paidvoucher: aggregatedPaidVouchers[date] || {
-          date: date,
-          totalAmount: 0,
-        },
+        paidvoucher: aggregatedPaidVouchers[date] || { date: date, totalAmount: 0 },
         doccharge: aggregatedDocCharges[date] || { date: date, totalAmount: 0 },
         ledger: aggregatedLedger[date] || { date: date, totalAmount: 0 },
-        appraisals: aggregatedAppraisals[date] || {
-          date: date,
-          totalAmount: 0,
-        },
-        closingBalance: formatNumber(closingBalance),
+        appraisals: aggregatedAppraisals[date] || { date: date, totalAmount: 0 },
+        closingBalance: formatNumber(closingBalance),  // Set closing balance for current date
       };
     });
   };
-
+  
+  
   const calculateClosingBalance = (prevClosingBalance, date) => {
     const openingBalance = prevClosingBalance;
     const dayToDayTotal = aggregatedExpenses[date]?.totalAmount || 0;
