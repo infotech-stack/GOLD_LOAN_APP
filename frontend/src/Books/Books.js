@@ -291,7 +291,7 @@ const Books = () => {
             return (
               <Typography className="font-tamil">
                 {" "}
-                நகை பெறுவோரின் கையொப்பம் திட்டம்
+                நகை பெறுவோரின் கையொப்பம் 
               </Typography>
             );
           case "heading17":

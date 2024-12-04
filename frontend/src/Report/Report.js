@@ -153,30 +153,7 @@ const Report = () => {
       }
     }
 
-    if (name === "interestPrinciple") {
-     
-      if (currentDate <= lastDateForLoan) {
-     
-        if (parseFloat(value) > parseFloat(formData.interest)) {
-          setValidationErrors((prevState) => ({
-            ...prevState,
-            interestPrinciple: true,
-          }));
-          return;
-        } else {
-          setValidationErrors((prevState) => ({
-            ...prevState,
-            interestPrinciple: false,
-          }));
-        }
-      } else {
-        // Skip validation if the loan period is over (past the last date for loan)
-        setValidationErrors((prevState) => ({
-          ...prevState,
-          interestPrinciple: false, // Make sure it's reset or not marked as an error
-        }));
-      }
-    }
+    
 
     if (name === "date") {
       const formattedDate = value; // Already in the correct format
@@ -1491,7 +1468,7 @@ const Report = () => {
                   error={validationErrors.interestPrinciple}
                   helperText={
                     validationErrors.interestPrinciple
-                      ? `Interest amount cannot exceed ${formData.interest}`
+                     ? "Interest is required"
                       : ""
                   }
                   type="number"

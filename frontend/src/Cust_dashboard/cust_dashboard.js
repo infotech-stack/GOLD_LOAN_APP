@@ -577,9 +577,7 @@ function CustomerDashboard() {
                         Interest Amount
                       </TableCell>
 
-                      <TableCell sx={{ border: "1px solid black" }}>
-                        Balance
-                      </TableCell>
+                     
                     </TableRow>
             </TableHead>
             <TableBody>
@@ -604,9 +602,7 @@ function CustomerDashboard() {
         <TableCell sx={{ border: "1px solid black" }}>
           {entry.interestPrinciple}
         </TableCell>
-        <TableCell sx={{ border: "1px solid black" }}>
-          {entry.balance}
-        </TableCell>
+        
       </TableRow>
     ))
   ) : (

@@ -477,7 +477,7 @@ const Reminders = () => {
   };
 
   const handleEditSubmit = async (form) => {
-    // Prevent default if needed
+   
     console.log("clicked");
 
     const updatedExpense = {
@@ -510,7 +510,7 @@ const Reminders = () => {
 
         handleEditClose();
       } else {
-        // Show error alert
+    
         Swal.fire({
           icon: "error",
           title: "Update Failed",
