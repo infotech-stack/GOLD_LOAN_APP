@@ -1,9 +1,9 @@
 {
   "files": {
     "main.css": "/static/css/main.0d397f91.css",
-    "main.js": "/static/js/main.74b3b8fb.js",
-    "static/js/213.17a768cb.chunk.js": "/static/js/213.17a768cb.chunk.js",
-    "static/js/455.9d5c7ecf.chunk.js": "/static/js/455.9d5c7ecf.chunk.js",
+    "main.js": "/static/js/main.72bc03f1.js",
+    "static/js/621.7672ca36.chunk.js": "/static/js/621.7672ca36.chunk.js",
+    "static/js/917.b462e81f.chunk.js": "/static/js/917.b462e81f.chunk.js",
     "static/media/KRT Gold Finance Logo PNG File.png": "/static/media/KRT Gold Finance Logo PNG File.036e7273f641d0518fab.png",
     "static/media/gold2.jpg": "/static/media/gold2.eff8fa8b917108176c43.jpg",
     "static/media/loan9.webp": "/static/media/loan9.a8f568ef929c0042f615.webp",
@@ -11,12 +11,12 @@
     "static/media/new adm.png": "/static/media/new adm.16fc9a0d40edf64da56c.png",
     "index.html": "/index.html",
     "main.0d397f91.css.map": "/static/css/main.0d397f91.css.map",
-    "main.74b3b8fb.js.map": "/static/js/main.74b3b8fb.js.map",
-    "213.17a768cb.chunk.js.map": "/static/js/213.17a768cb.chunk.js.map",
-    "455.9d5c7ecf.chunk.js.map": "/static/js/455.9d5c7ecf.chunk.js.map"
+    "main.72bc03f1.js.map": "/static/js/main.72bc03f1.js.map",
+    "621.7672ca36.chunk.js.map": "/static/js/621.7672ca36.chunk.js.map",
+    "917.b462e81f.chunk.js.map": "/static/js/917.b462e81f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0d397f91.css",
-    "static/js/main.74b3b8fb.js"
+    "static/js/main.72bc03f1.js"
   ]
 }

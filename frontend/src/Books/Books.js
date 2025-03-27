@@ -197,9 +197,8 @@ const Books = () => {
             return (
               <Typography className="font-tamil">
                 {" "}
-                4. நான் / நாங்கள் அடமானமாக வைக்க தங்கள் நிறுவனத்திற்கு கொண்டு
-                வந்து இருக்கும் நகைகள் அனைத்தும் என்னுடைய / எங்களுடைய சொந்த
-                நகைகள் என்பதை உறுதியுடன் தெரிவித்துக் கொள்கிறேன் / றோம்.
+                4.தங்களது நகைக்கடன் ரசீது தொலைந்து போனால் நிர்வாகம் கேட்கும்
+                சான்றிதழ்கள் கொடுக்க சம்மதம் தெரிவிக்கிறேன் / றோம்.
               </Typography>
             );
           case "heading5":
@@ -215,8 +214,10 @@ const Books = () => {
             return (
               <Typography className="font-tamil">
                 {" "}
-                6. தங்களது நகைக்கடன் ரசீது தொலைந்து போனால் நிர்வாகம் கேட்கும்
-                சான்றிதழ்கள் கொடுக்க சம்மதம் தெரிவிக்கிறேன் / றோம்.
+                6.  நான் / நாங்கள் அடமானமாக வைக்க தங்கள் நிறுவனத்திற்கு கொண்டு
+                வந்து இருக்கும் நகைகள் அனைத்தும் என்னுடைய / எங்களுடைய சொந்த
+                நகைகள் என்பதை உறுதியுடன் தெரிவித்துக் கொள்கிறேன் / றோம்.
+                
               </Typography>
             );
           case "heading7":
@@ -417,8 +418,8 @@ const Books = () => {
           case "heading4":
             return (
               <Typography className="font_book">
-                4. I / We hereby declare that all the jewelry which I / we are
-                bringing to your company for pawning is my / our own jewelry.
+                4.In case of loss of the jewelry loan receipt, I agree to
+                provide the certificates requested by the management.
               </Typography>
             );
           case "heading5":
@@ -432,8 +433,9 @@ const Books = () => {
           case "heading6":
             return (
               <Typography className="font_book">
-                6. In case of loss of the jewelry loan receipt, I agree to
-                provide the certificates requested by the management.
+                6. I / We hereby declare that all the jewelry which I / we are
+                bringing to your company for pawning is my / our own jewelry.
+           
               </Typography>
             );
           case "heading7":
